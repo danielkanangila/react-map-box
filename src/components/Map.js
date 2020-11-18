@@ -6,9 +6,27 @@ import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 mapBoxGl.accessToken =
   "pk.eyJ1IjoiZGFuaWVsa2FuYW5naWxhIiwiYSI6ImNraGdscTB6czBjMzMycXFtM3IzZW5xYjMifQ.yYPfYoQl0KVTlgRYszZ5Rg";
 
-const Map = ({ options, geocoderOptions, children }) => {
+const Map = ({
+  options,
+  geocoderOptions,
+  geocoderHandler,
+  children,
+  placeList,
+}) => {
   const [map, setMap] = useState(undefined);
   const [geocoder, setGeocoder] = useState(undefined);
+  const [places, setPlaces] = useState([]);
+
+  useEffect(() => {
+    if (map) {
+      setPlaces(placeList);
+
+      if (geocoder)
+        geocoder.on("result", (e) =>
+          geocoderHandler(e.result, setPlaces, places)
+        );
+    }
+  }, [placeList, geocoder]);
 
   /** Initialize Map box */
   useEffect(() => {
@@ -29,7 +47,7 @@ const Map = ({ options, geocoderOptions, children }) => {
     }
   }, [geocoderOptions, map]);
 
-  return <div className="map-elements">{children(map, geocoder)}</div>;
+  return <div className="map-elements">{children(map, geocoder, places)}</div>;
 };
 
 export default Map;

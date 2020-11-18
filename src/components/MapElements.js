@@ -4,6 +4,7 @@ import Map from "./Map";
 import groomers from "./../data/groomers.json";
 import Marker from "./Marker";
 import MapPlaceList from "./MapPlaceList";
+import mapboxgl from "mapbox-gl";
 
 const mapBoxOptions = {
   container: "mapContainer",
@@ -28,8 +29,16 @@ const MapElements = () => {
 
   const handleGeocoderResult = (result, setState, oldState) => {
     //*** HANDLE GEOCODER RESULT HERE */
-    // const resultGeometry = result.geom
-    // const newState = oldState.filter((item) => placeName.includes(item.city));
+    // Clean Map marker
+    if (result) {
+      new mapboxgl.Marker().remove();
+    }
+    // Get the result place name
+    const placeName = result.place_name;
+    // Filter the place list to have only the place corresponding to the result
+    oldState = oldState.filter(
+      (item) => placeName.includes(item.city) || placeName.includes(item.state)
+    );
     // setState(newState);
     /** Add distance to the state */
     const newState = [];
@@ -43,21 +52,26 @@ const MapElements = () => {
       });
       newState.push({
         ...place,
-        distance,
+        distance: `${parseFloat(distance).toFixed(2)} miles`,
       });
     }
+    // Map List state
     setState(newState);
   };
 
   return (
-    <Map options={mapBoxOptions} geocoderOptions={geocoderOptions}>
-      {(map, geocoder) => (
+    <Map
+      options={mapBoxOptions}
+      geocoderOptions={geocoderOptions}
+      geocoderHandler={handleGeocoderResult}
+      placeList={groomers}
+    >
+      {(map, geocoder, places) => (
         <>
           <MapPlaceList
-            placeList={groomers}
+            placeList={places}
             map={map}
             geocoder={geocoder}
-            geocoderHandler={handleGeocoderResult}
             Item={MapListItem}
           />
           <div className="map-container" id="mapContainer"></div>
@@ -69,6 +83,7 @@ const MapElements = () => {
                 onClick={() => console.log(groomer)}
                 key={groomer.id}
               >
+                <div className="marker-pin"></div>
                 <img src={groomer.avatarUrl} alt={groomer.name} />
               </Marker>
             ))}
@@ -84,7 +99,7 @@ const MapListItem = ({ map, geocoder, place }) => {
     e.preventDefault();
     map.flyTo({
       center: [place.longitude, place.latitude],
-      zoom: 10,
+      zoom: 15,
     });
   };
   return (

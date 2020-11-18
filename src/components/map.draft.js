@@ -88,7 +88,7 @@ const Map = (props) => {
         }
         listedGroomers(groomerByArea);
         // Open a popup for the closest groomer and highlight it in the list
-        createPopUp(groomerByArea.features[0]);
+         (groomerByArea.features[0]);
         var activeListing = document.getElementById(
           "listing-" + groomerByArea.features[0].properties.id
         );
@@ -158,7 +158,7 @@ const Map = (props) => {
             if (this.id === "link-" + data.features[i].properties.id) {
               var clickedListing = data.features[i];
               flyToGroomer(clickedListing);
-              createPopUp(clickedListing);
+               (clickedListing);
             }
           }
           var activeItem = document.getElementsByClassName("active");
@@ -177,7 +177,7 @@ const Map = (props) => {
       });
     }
     // Create a Mapbox GL JS `Popup`.
-    function createPopUp(currentFeature) {
+    function  (currentFeature) {
       var popUps = document.getElementsByClassName("mapboxgl-popup");
       if (popUps[0]) popUps[0].remove();
       var popup = new mapboxgl.Popup({ closeOnClick: false })
